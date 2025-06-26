@@ -1,0 +1,83 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+env.bak/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+.pytest_cache/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+*.pot
+*.pyc
+
+# Secret settings (you should manually create this in .env or settings)
+.env
+.env.*
+
+# Django migrations (optional – useful to keep if shared)
+**/migrations/__pycache__/
+**/migrations/*.pyc
+# Uncomment the next line ONLY if you auto-generate and don’t want to keep them
+# **/migrations/*.py
+
+# PyCharm IDE files
+.idea/
+*.iml
+
+# VS Code (if you switch or others use it)
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Git conflicts
+*.orig
+
+# Node modules (if using npm for static assets)
+node_modules/
+
+# CSV exports or temp files
+*.csv
+*.bak
+*.swp
+*.tmp
+
