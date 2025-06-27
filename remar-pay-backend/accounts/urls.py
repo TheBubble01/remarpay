@@ -27,3 +27,9 @@ from .views import UserProfileView
 urlpatterns += [
     path('profile/', UserProfileView.as_view(), name='user_profile'),
 ]
+
+from .views import ChangePasswordView
+
+urlpatterns += [
+    path('change-password/', ChangePasswordView.as_view(), name='change_password'),
+]

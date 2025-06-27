@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserCreateSerializer, UserProfileSerializer
+from .serializers import UserCreateSerializer, UserProfileSerializer, PasswordChangeSerializer
 from .permissions import IsTechAdmin, IsManager
 from rest_framework.permissions import IsAuthenticated
 from .models import User
@@ -90,3 +90,13 @@ class UserProfileView(APIView):
             }, status=200)
         return Response(serializer.errors, status=400)
 
+# Change password
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        serializer = PasswordChangeSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Password updated successfully."})
+        return Response(serializer.errors, status=400)

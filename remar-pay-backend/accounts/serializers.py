@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import User
+from django.contrib.auth.password_validation import validate_password
+from rest_framework import serializers
 
 class UserCreateSerializer(serializers.ModelSerializer):
     # Confirm password field (optional, for UX)
@@ -32,3 +34,30 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'name', 'email', 'phone', 'role', 'profile_pic', 'created_at']
         read_only_fields = ['email', 'role', 'created_at']  # Prevent editing these fields
+
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = self.context['request'].user
+
+        # Check current password is correct
+        if not user.check_password(data['current_password']):
+            raise serializers.ValidationError({"current_password": "Incorrect current password."})
+
+        # Check new and confirm match
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "New passwords do not match."})
+
+        # Optional: enforce strong password policy
+        validate_password(data['new_password'], user)
+
+        return data
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user
