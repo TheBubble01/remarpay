@@ -21,3 +21,9 @@ from .views import SuspendUserView
 urlpatterns += [
     path('suspend/', SuspendUserView.as_view(), name='suspend_user'),
 ]
+
+from .views import UserProfileView
+
+urlpatterns += [
+    path('profile/', UserProfileView.as_view(), name='user_profile'),
+]

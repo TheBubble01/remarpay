@@ -26,3 +26,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
         # Create user using the manager
         user = User.objects.create_user(password=password, **validated_data)
         return user
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'email', 'phone', 'role', 'profile_pic', 'created_at']
+        read_only_fields = ['email', 'role', 'created_at']  # Prevent editing these fields

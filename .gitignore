@@ -44,6 +44,7 @@ staticfiles/
 # Secret settings (you should manually create this in .env or settings)
 .env
 .env.*
+/profile/
 
 # Django migrations (optional – useful to keep if shared)
 **/migrations/__pycache__/

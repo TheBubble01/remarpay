@@ -4,10 +4,11 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserCreateSerializer
+from .serializers import UserCreateSerializer, UserProfileSerializer
 from .permissions import IsTechAdmin, IsManager
 from rest_framework.permissions import IsAuthenticated
 from .models import User
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 
 # Only accessible by tech-admins
 class TechAdminOnlyView(APIView):
@@ -69,3 +70,23 @@ class SuspendUserView(APIView):
                 "is_active": user.is_active
             }
         }, status=200)
+    
+# User profile view/edit
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]  # ✅ Now supports all 3
+
+    def get(self, request):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "Profile updated successfully",
+                "profile": serializer.data
+            }, status=200)
+        return Response(serializer.errors, status=400)
+
