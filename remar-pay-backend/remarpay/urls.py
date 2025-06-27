@@ -21,5 +21,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),  # This connects to the login routes
+    path('api/rates/', include('rates.urls')),
 ]
 
