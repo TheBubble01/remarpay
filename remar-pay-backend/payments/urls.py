@@ -3,7 +3,8 @@ from .views import (
     CreatePaymentRequestView,
     AgentPaymentListView,
     MarkPaymentAsPaid,
-    UploadReceiptView
+    UploadReceiptView,
+    CreatePaymentRequestView
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path('agent-list/', AgentPaymentListView.as_view(), name='agent_payments'),
     path('confirm/<int:pk>/', MarkPaymentAsPaid.as_view(), name='confirm_payment'),
     path('upload/<int:pk>/', UploadReceiptView.as_view(), name='upload_receipt'),
+    path('cashier/create-request/', CreatePaymentRequestView.as_view(), name='create-payment-request'),
 ]
