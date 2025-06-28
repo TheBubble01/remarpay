@@ -33,3 +33,9 @@ from .views import ChangePasswordView
 urlpatterns += [
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
 ]
+
+from .views import AssignRoleView
+
+urlpatterns += [
+    path('<int:pk>/assign-role/', AssignRoleView.as_view(), name='assign_user_role'),
+]

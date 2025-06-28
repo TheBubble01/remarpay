@@ -60,3 +60,20 @@ class PasswordChangeSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+
+class AssignRoleSerializer(serializers.ModelSerializer):
+    assigned_country = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = ['role', 'assigned_country']
+
+    def validate(self, data):
+        role = data.get('role')
+        country = data.get('assigned_country')
+
+        if role == 'agent' and not country:
+            raise serializers.ValidationError("Assigned country is required for agents.")
+        if role != 'agent':
+            data['assigned_country'] = None
+        return data

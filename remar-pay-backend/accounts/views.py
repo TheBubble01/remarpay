@@ -4,11 +4,12 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserCreateSerializer, UserProfileSerializer, PasswordChangeSerializer
+from .serializers import UserCreateSerializer, UserProfileSerializer, PasswordChangeSerializer, AssignRoleSerializer
 from .permissions import IsTechAdmin, IsManager
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, BasePermission
 from .models import User
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+from rest_framework.generics import UpdateAPIView
 
 # Only accessible by tech-admins
 class TechAdminOnlyView(APIView):
@@ -100,3 +101,14 @@ class ChangePasswordView(APIView):
             serializer.save()
             return Response({"message": "Password updated successfully."})
         return Response(serializer.errors, status=400)
+
+# Manager or Tech-Admin can assign roles
+class IsManagerOrTechAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role in ['manager', 'tech-admin']
+
+class AssignRoleView(UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = AssignRoleSerializer
+    permission_classes = [IsManagerOrTechAdmin]
+    http_method_names = ['patch']
