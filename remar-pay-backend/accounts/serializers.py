@@ -77,3 +77,14 @@ class AssignRoleSerializer(serializers.ModelSerializer):
         if role != 'agent':
             data['assigned_country'] = None
         return data
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ['password', 'user_permissions', 'groups']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if instance.role == 'tech-admin':
+            return None  # Skip tech-admins entirely
+        return rep

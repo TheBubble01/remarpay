@@ -4,13 +4,18 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserCreateSerializer, UserProfileSerializer, PasswordChangeSerializer, AssignRoleSerializer
 from .permissions import IsTechAdmin, IsManager
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from .models import User
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from rest_framework.generics import UpdateAPIView
-
+from rest_framework.generics import UpdateAPIView, ListAPIView
+from .serializers import (
+    UserCreateSerializer,
+    UserProfileSerializer,
+    PasswordChangeSerializer,
+    AssignRoleSerializer,
+    UserListSerializer
+)
 # Only accessible by tech-admins
 class TechAdminOnlyView(APIView):
     permission_classes = [IsAuthenticated, IsTechAdmin]
@@ -107,8 +112,17 @@ class IsManagerOrTechAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ['manager', 'tech-admin']
 
+# Assign roles to users (and country for agents)
 class AssignRoleView(UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = AssignRoleSerializer
     permission_classes = [IsManagerOrTechAdmin]
     http_method_names = ['patch']
+
+# List all users (excluding tech-admins)
+class UserListView(ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.exclude(role='tech-admin')

@@ -39,3 +39,9 @@ from .views import AssignRoleView
 urlpatterns += [
     path('<int:pk>/assign-role/', AssignRoleView.as_view(), name='assign_user_role'),
 ]
+
+from .views import UserListView
+
+urlpatterns += [
+    path('list/', UserListView.as_view(), name='user_list'),
+]
