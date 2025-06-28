@@ -14,7 +14,8 @@ from .serializers import (
     UserProfileSerializer,
     PasswordChangeSerializer,
     AssignRoleSerializer,
-    UserListSerializer
+    UserListSerializer,
+    ResetUserCredentialsSerializer
 )
 # Only accessible by tech-admins
 class TechAdminOnlyView(APIView):
@@ -117,6 +118,13 @@ class AssignRoleView(UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = AssignRoleSerializer
     permission_classes = [IsManagerOrTechAdmin]
+    http_method_names = ['patch']
+
+# Reset user credentials (tech-admin only)
+class ResetUserCredentialsView(UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = ResetUserCredentialsSerializer
+    permission_classes = [IsTechAdmin]
     http_method_names = ['patch']
 
 # List all users (excluding tech-admins)

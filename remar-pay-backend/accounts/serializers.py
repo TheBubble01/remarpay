@@ -88,3 +88,24 @@ class UserListSerializer(serializers.ModelSerializer):
         if instance.role == 'tech-admin':
             return None  # Skip tech-admins entirely
         return rep
+
+class ResetUserCredentialsSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+    email = serializers.EmailField(required=False)
+
+    class Meta:
+        model = User
+        fields = ['email', 'password']
+
+    def validate(self, data):
+        if not data.get('email') and not data.get('password'):
+            raise serializers.ValidationError("Provide at least email or password to reset.")
+        return data
+
+    def update(self, instance, validated_data):
+        if 'email' in validated_data:
+            instance.email = validated_data['email']
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
+        instance.save()
+        return instance

@@ -45,3 +45,9 @@ from .views import UserListView
 urlpatterns += [
     path('list/', UserListView.as_view(), name='user_list'),
 ]
+
+from .views import ResetUserCredentialsView
+
+urlpatterns += [
+    path('<int:pk>/reset/', ResetUserCredentialsView.as_view(), name='reset_user_credentials'),
+]
