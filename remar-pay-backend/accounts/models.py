@@ -26,6 +26,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('tech-admin', 'Tech Admin'),
     ]
 
+
+    # Country assignment for agents
+    assigned_country = models.CharField(
+        max_length=20,
+        choices=[
+            ('nigeria', 'Nigeria'),
+            ('niger', 'Niger'),
+            ('cameroon', 'Cameroon')
+        ],
+        blank=True,
+        null=True
+    )
+
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     phone = models.CharField(max_length=20, blank=True)
