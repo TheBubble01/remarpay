@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import PaymentRequest
 from accounts.models import User
-from core.models import ExchangeRate  # assuming this is where your rate is stored
+from rates.models import ExchangeRate  # assuming this is where your rate is stored
 
 class PaymentRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentRequest
         exclude = ['status', 'cashier', 'created_at']  # system-managed fields
+        read_only_fields = ['net_amount_dinar', 'converted_amount', 'conversion_rate', 'fee_applied']
 
     def validate(self, data):
         country = data.get('country')
@@ -41,7 +42,7 @@ class PaymentRequestSerializer(serializers.ModelSerializer):
         # Get current conversion rate
         try:
             rate = ExchangeRate.objects.get(country=country)
-            conversion_rate = rate.company_rate
+            conversion_rate = rate.remar_rate
         except ExchangeRate.DoesNotExist:
             raise serializers.ValidationError("Conversion rate not set for selected country.")
 
@@ -65,5 +66,5 @@ class PaymentRequestSerializer(serializers.ModelSerializer):
             depositor_name=validated_data['depositor_name'],
             depositor_phone=validated_data['depositor_phone']
         )
-
+        
         return payment_request
