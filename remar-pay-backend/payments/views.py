@@ -5,9 +5,7 @@ from accounts.permissions import IsCashier
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.http import FileResponse
 from .utils.receipt_generator import generate_receipt_image
-import os
 
 class CreatePaymentRequestView(generics.CreateAPIView):
     queryset = PaymentRequest.objects.all()
@@ -27,13 +25,29 @@ class GenerateReceiptView(APIView):
         except PaymentRequest.DoesNotExist:
             return Response({"error": "Payment not found."}, status=404)
 
-        # Generate file path
-        filename = f"receipt_{payment.pk}.png"
-        file_path = os.path.join(settings.MEDIA_ROOT, 'receipts', filename)
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        data = {
+            "id": payment.id,
+            "country": payment.country,
+            "depositor_name": payment.depositor_name,
+            "depositor_phone": payment.depositor_phone,
+            "deposit_amount_dinar": float(payment.deposit_amount_dinar),
+            "converted_amount": float(payment.converted_amount),
+            "conversion_rate": float(payment.conversion_rate),
+            "fee_applied": payment.fee_applied,
 
-        # Generate image
-        generate_receipt_image(payment, file_path)
+            # Conditional fields
+            "receiver": {
+                "name": payment.receiver_name,
+                "phone": payment.receiver_phone,
+                "nita_office": getattr(payment, 'nita_office', None),
+            },
+            "bank_details": {
+                "bank_name": getattr(payment, 'receiver_bank_name', None),
+                "account_number": getattr(payment, 'receiver_account_number', None),
+                "account_name": getattr(payment, 'receiver_account_name', None),
+            },
+            "cashier_name": payment.cashier.name,
+            "created_at": payment.created_at.strftime('%Y-%m-%d %H:%M')
+        }
 
-        # Return downloadable image
-        return FileResponse(open(file_path, 'rb'), content_type='image/png')
+        return Response(data)
