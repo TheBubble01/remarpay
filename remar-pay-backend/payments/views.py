@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .utils.receipt_generator import generate_receipt_image
+from django.utils import timezone
+
 
 class CreatePaymentRequestView(generics.CreateAPIView):
     queryset = PaymentRequest.objects.all()
