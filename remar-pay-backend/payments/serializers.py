@@ -68,3 +68,12 @@ class PaymentRequestSerializer(serializers.ModelSerializer):
         )
         
         return payment_request
+
+class AgentPaymentConfirmationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentRequest
+        fields = ['is_paid', 'agent_receipt']  # Only these two are editable
+        extra_kwargs = {
+            'is_paid': {'required': True},
+            'agent_receipt': {'required': False},
+        }

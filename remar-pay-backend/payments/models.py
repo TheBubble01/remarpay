@@ -54,5 +54,12 @@ class PaymentRequest(models.Model):
     # Timestamp
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Agent's operations
+    is_paid = models.BooleanField(default=False)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    payment_agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='payments_made')
+    agent_receipt = models.ImageField(upload_to='agent_receipts/', null=True, blank=True)
+
+
     def __str__(self):
         return f"{self.cashier.name} → {self.country.upper()} ({self.converted_amount})"

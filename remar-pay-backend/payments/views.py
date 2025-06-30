@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .models import PaymentRequest
-from .serializers import PaymentRequestSerializer
+from .serializers import PaymentRequestSerializer, AgentPaymentConfirmationSerializer
 from accounts.permissions import IsCashier
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -51,3 +51,36 @@ class GenerateReceiptView(APIView):
         }
 
         return Response(data)
+    
+# Agent's end:
+# List assigned country requests
+class AssignedRequestsListView(generics.ListAPIView):
+    serializer_class = PaymentRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return PaymentRequest.objects.filter(
+            country=user.assigned_country,
+            is_paid=False
+        ).order_by('-created_at')
+
+# Confirm a payment (mark as paid)
+class ConfirmPaymentView(generics.UpdateAPIView):
+    serializer_class = AgentPaymentConfirmationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return PaymentRequest.objects.filter(
+            country=user.assigned_country,
+            is_paid=False
+        )
+
+    def perform_update(self, serializer):
+        serializer.save(
+            is_paid=True,
+            paid_at=timezone.now(),
+            payment_agent=self.request.user
+        )
+   
