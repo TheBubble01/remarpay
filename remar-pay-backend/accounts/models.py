@@ -48,6 +48,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # User's current operating country
+    current_country = models.CharField(max_length=50, blank=True, null=True)
+
+    # Timezone string, e.g. 'Africa/Lagos'
+    timezone = models.CharField(max_length=100, blank=True, null=True)
+
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
 
