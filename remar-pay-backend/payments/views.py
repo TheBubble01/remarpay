@@ -1,13 +1,16 @@
 from rest_framework import generics, permissions
-from .models import PaymentRequest
-from .serializers import PaymentRequestSerializer, AgentPaymentConfirmationSerializer
+from payments.models import PaymentRequest
+from payments.serializers import PaymentRequestSerializer, AgentPaymentConfirmationSerializer
 from accounts.permissions import IsCashier
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .utils.receipt_generator import generate_receipt_image
+from payments.utils.receipt_generator import generate_receipt_image
 from django.utils import timezone
-
+from django.db.models import Sum, Q
+from django.utils.dateparse import parse_date
+# from accounts.models import User
+from rates.models import ExchangeRate
 
 class CreatePaymentRequestView(generics.CreateAPIView):
     queryset = PaymentRequest.objects.all()
@@ -110,4 +113,77 @@ class CancelPaymentRequestView(APIView):
 
         return Response({"message": "Request cancelled successfully."}, status=200)
     
-   
+# Analytics
+class CompanyAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get all successful requests (not cancelled)
+        requests = PaymentRequest.objects.filter(is_cancelled=False, is_paid=True)
+
+        summary = {
+            "total_dinar_collected": 0,
+            "fixed_fee_profit_dinar": 0,
+            "exchange_margin_profit_dinar": 0,
+            "total_estimated_profit_dinar": 0,
+            "num_successful_requests": requests.count(),
+            "num_cancelled_requests": PaymentRequest.objects.filter(is_cancelled=True).count(),
+            "outstanding_balance_estimate": 0,
+        }
+
+        per_currency = {}
+        total_sent_by_agents = 0
+        total_margin_profit_dinar = 0
+        fixed_fee_dinar = PaymentRequest.objects.filter(fee_applied=True).count() * 5
+
+        for country_code in ['nigeria', 'niger', 'cameroon']:
+            country_requests = requests.filter(country=country_code)
+            if not country_requests.exists():
+                continue
+
+            try:
+                rate_obj = ExchangeRate.objects.get(country=country_code)
+            except ExchangeRate.DoesNotExist:
+                continue
+
+            total_sent = country_requests.aggregate(total=Sum('converted_amount'))['total'] or 0
+            currency = rate_obj.currency_code
+            margin_profit_local = 0
+            margin_profit_dinar = 0
+
+            for req in country_requests:
+                if req.conversion_rate and req.net_amount_dinar:
+                    try:
+                        market_rate = ExchangeRate.objects.get(country=req.country).market_rate
+                        margin = (market_rate - req.conversion_rate) * req.net_amount_dinar
+                        margin_profit_local += margin
+                        # Convert this margin back to Dinar
+                        margin_profit_dinar += (margin / req.conversion_rate)
+                    except:
+                        continue
+
+            total_sent_by_agents += total_sent
+            total_margin_profit_dinar += margin_profit_dinar
+
+            per_currency[country_code] = {
+                "currency": currency,
+                "total_sent_by_agents": total_sent,
+                "exchange_margin_profit_local": round(margin_profit_local, 2),
+                "converted_back_to_dinar": round(margin_profit_dinar, 2),
+            }
+
+        summary["total_dinar_collected"] = PaymentRequest.objects.aggregate(
+            total=Sum('deposit_amount_dinar'))['total'] or 0
+
+        summary["fixed_fee_profit_dinar"] = fixed_fee_dinar
+        summary["exchange_margin_profit_dinar"] = round(total_margin_profit_dinar, 2)
+        summary["total_estimated_profit_dinar"] = round(total_margin_profit_dinar + fixed_fee_dinar, 2)
+
+        # Estimate balance = dinar collected - equivalent sent
+        total_net_dinar = requests.aggregate(total=Sum('net_amount_dinar'))['total'] or 0
+        summary["outstanding_balance_estimate"] = round(summary["total_dinar_collected"] - total_net_dinar, 2)
+
+        return Response({
+            "summary": summary,
+            "per_currency": per_currency
+        })
