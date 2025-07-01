@@ -64,7 +64,8 @@ class AssignedRequestsListView(generics.ListAPIView):
         user = self.request.user
         return PaymentRequest.objects.filter(
             country=user.assigned_country,
-            is_paid=False
+            is_paid=False,
+            is_cancelled=False
         ).order_by('-created_at')
 
 # Confirm a payment (mark as paid)
@@ -85,4 +86,28 @@ class ConfirmPaymentView(generics.UpdateAPIView):
             paid_at=timezone.now(),
             payment_agent=self.request.user
         )
+
+# Cancelled order
+class CancelPaymentRequestView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            payment = PaymentRequest.objects.get(pk=pk, cashier=request.user)
+        except PaymentRequest.DoesNotExist:
+            return Response({"error": "Payment not found."}, status=404)
+
+        if payment.is_paid:
+            return Response({"error": "Cannot cancel a paid request."}, status=400)
+
+        if payment.is_cancelled:
+            return Response({"error": "Request already cancelled."}, status=400)
+
+        reason = request.data.get('reason', '')
+        payment.is_cancelled = True
+        payment.cancel_reason = reason
+        payment.save()
+
+        return Response({"message": "Request cancelled successfully."}, status=200)
+    
    

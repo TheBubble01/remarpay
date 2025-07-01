@@ -60,6 +60,9 @@ class PaymentRequest(models.Model):
     payment_agent = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='payments_made')
     agent_receipt = models.ImageField(upload_to='agent_receipts/', null=True, blank=True)
 
+    # Cancelled order
+    is_cancelled = models.BooleanField(default=False)
+    cancel_reason = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.cashier.name} → {self.country.upper()} ({self.converted_amount})"

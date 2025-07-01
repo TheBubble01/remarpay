@@ -4,7 +4,8 @@ from .views import (
     CreatePaymentRequestView,
     GenerateReceiptView,
     AssignedRequestsListView,
-    ConfirmPaymentView
+    ConfirmPaymentView,
+    CancelPaymentRequestView
 )
 
 urlpatterns = [
@@ -13,5 +14,6 @@ urlpatterns = [
     path('cashier/receipt/<int:pk>/', GenerateReceiptView.as_view(), name='generate-receipt'),
     path('agent/requests/', AssignedRequestsListView.as_view(), name='agent-requests'),
     path('agent/confirm/<int:pk>/', ConfirmPaymentView.as_view(), name='confirm-payment'),
+    path('cashier/cancel/<int:pk>/', CancelPaymentRequestView.as_view(), name='cancel-payment'),
 ]
 
