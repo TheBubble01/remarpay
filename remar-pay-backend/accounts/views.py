@@ -15,7 +15,8 @@ from .serializers import (
     PasswordChangeSerializer,
     AssignRoleSerializer,
     UserListSerializer,
-    ResetUserCredentialsSerializer
+    ResetUserCredentialsSerializer,
+    UserPreferenceSerializer
 )
 # Only accessible by tech-admins
 class TechAdminOnlyView(APIView):
@@ -134,3 +135,18 @@ class UserListView(ListAPIView):
 
     def get_queryset(self):
         return User.objects.exclude(role='tech-admin')
+
+# User timezone preference
+class UserPreferenceView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserPreferenceSerializer(request.user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserPreferenceSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Preferences updated successfully", "data": serializer.data})
+        return Response(serializer.errors, status=400)

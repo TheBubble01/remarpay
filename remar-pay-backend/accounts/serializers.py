@@ -109,3 +109,9 @@ class ResetUserCredentialsSerializer(serializers.ModelSerializer):
             instance.set_password(validated_data['password'])
         instance.save()
         return instance
+
+# User timezone preference
+class UserPreferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['current_country', 'timezone']

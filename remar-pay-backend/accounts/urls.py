@@ -51,3 +51,9 @@ from .views import ResetUserCredentialsView
 urlpatterns += [
     path('<int:pk>/reset/', ResetUserCredentialsView.as_view(), name='reset_user_credentials'),
 ]
+
+from .views import UserPreferenceView
+
+urlpatterns += [
+    path('profile/preferences/', UserPreferenceView.as_view(), name='user-preference'),
+]
