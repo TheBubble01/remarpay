@@ -114,4 +114,4 @@ class ResetUserCredentialsSerializer(serializers.ModelSerializer):
 class UserPreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['current_country', 'timezone']
+        fields = ['current_country', 'timezone', 'dark_mode']

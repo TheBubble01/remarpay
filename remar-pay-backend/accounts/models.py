@@ -54,6 +54,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Timezone string, e.g. 'Africa/Lagos'
     timezone = models.CharField(max_length=100, blank=True, null=True)
 
+    # User dark mode preference
+    dark_mode = models.BooleanField(default=False)
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['name']
