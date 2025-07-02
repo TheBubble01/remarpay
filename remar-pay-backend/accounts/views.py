@@ -1,14 +1,12 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from .permissions import IsTechAdmin, IsManager
-from rest_framework.permissions import IsAuthenticated, BasePermission
-from .models import User
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework.generics import UpdateAPIView, ListAPIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, BasePermission
+from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
+
+from .models import User
+from .permissions import IsTechAdmin, IsManager
 from .serializers import (
     UserCreateSerializer,
     UserProfileSerializer,
@@ -18,14 +16,20 @@ from .serializers import (
     ResetUserCredentialsSerializer,
     UserPreferenceSerializer
 )
-# Only accessible by tech-admins
+
+# --------------------------------------------
+# ✅ Tech Admin Dashboard
+# --------------------------------------------
 class TechAdminOnlyView(APIView):
     permission_classes = [IsAuthenticated, IsTechAdmin]
 
     def get(self, request):
         return Response({"message": "Welcome, Tech Admin!"})
 
-# View for tech-admin to create users
+
+# --------------------------------------------
+# ✅ User Creation (Tech Admin Only)
+# --------------------------------------------
 class CreateUserView(APIView):
     permission_classes = [IsAuthenticated, IsTechAdmin]
 
@@ -45,7 +49,10 @@ class CreateUserView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# View for suspending/unsuspending users
+
+# --------------------------------------------
+# ✅ Suspend/Unsuspend User (Tech Admin & Manager)
+# --------------------------------------------
 class SuspendUserView(APIView):
     permission_classes = [IsAuthenticated, IsTechAdmin | IsManager]
 
@@ -58,7 +65,6 @@ class SuspendUserView(APIView):
         except User.DoesNotExist:
             return Response({"error": "User not found."}, status=404)
 
-        # Prevent self-suspension or suspending tech-admins
         if user.role == 'tech-admin':
             return Response({"error": "You cannot suspend a tech-admin."}, status=403)
 
@@ -78,11 +84,14 @@ class SuspendUserView(APIView):
                 "is_active": user.is_active
             }
         }, status=200)
-    
-# User profile view/edit
+
+
+# --------------------------------------------
+# ✅ Profile View/Update (All Users)
+# --------------------------------------------
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]  # ✅ Now supports all 3
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get(self, request):
         serializer = UserProfileSerializer(request.user)
@@ -98,7 +107,10 @@ class UserProfileView(APIView):
             }, status=200)
         return Response(serializer.errors, status=400)
 
-# Change password
+
+# --------------------------------------------
+# ✅ Change Password
+# --------------------------------------------
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -109,26 +121,34 @@ class ChangePasswordView(APIView):
             return Response({"message": "Password updated successfully."})
         return Response(serializer.errors, status=400)
 
-# Manager or Tech-Admin can assign roles
+
+# --------------------------------------------
+# ✅ Role Assignment (Tech Admin or Manager)
+# --------------------------------------------
 class IsManagerOrTechAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ['manager', 'tech-admin']
 
-# Assign roles to users (and country for agents)
 class AssignRoleView(UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = AssignRoleSerializer
     permission_classes = [IsManagerOrTechAdmin]
     http_method_names = ['patch']
 
-# Reset user credentials (tech-admin only)
+
+# --------------------------------------------
+# ✅ Reset Credentials (Tech Admin Only)
+# --------------------------------------------
 class ResetUserCredentialsView(UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = ResetUserCredentialsSerializer
     permission_classes = [IsTechAdmin]
     http_method_names = ['patch']
 
-# List all users (excluding tech-admins)
+
+# --------------------------------------------
+# ✅ User List (Excludes Tech Admins)
+# --------------------------------------------
 class UserListView(ListAPIView):
     serializer_class = UserListSerializer
     permission_classes = [IsAuthenticated]
@@ -136,7 +156,10 @@ class UserListView(ListAPIView):
     def get_queryset(self):
         return User.objects.exclude(role='tech-admin')
 
-# User timezone preference
+
+# --------------------------------------------
+# ✅ User Preferences (Country, Timezone, Theme)
+# --------------------------------------------
 class UserPreferenceView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -148,5 +171,8 @@ class UserPreferenceView(APIView):
         serializer = UserPreferenceSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Preferences updated successfully", "data": serializer.data})
+            return Response({
+                "message": "Preferences updated successfully",
+                "data": serializer.data
+            })
         return Response(serializer.errors, status=400)

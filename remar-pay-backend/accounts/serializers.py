@@ -1,39 +1,40 @@
 from rest_framework import serializers
-from .models import User
 from django.contrib.auth.password_validation import validate_password
+from .models import User
 
+# ----------------------
+# ✅ User Creation
+# ----------------------
 class UserCreateSerializer(serializers.ModelSerializer):
-    # Confirm password field (optional, for UX)
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'phone', 'role', 'password', 'confirm_password']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        extra_kwargs = {'password': {'write_only': True}}
 
     def validate(self, data):
-        # Check if password and confirm_password match
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError("Passwords do not match.")
         return data
 
     def create(self, validated_data):
-        # Remove confirm_password before creating
         validated_data.pop('confirm_password')
         password = validated_data.pop('password')
+        return User.objects.create_user(password=password, **validated_data)
 
-        # Create user using the manager
-        user = User.objects.create_user(password=password, **validated_data)
-        return user
-
+# ----------------------
+# ✅ Profile View/Update
+# ----------------------
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'phone', 'role', 'profile_pic', 'created_at']
-        read_only_fields = ['email', 'role', 'created_at']  # Prevent editing these fields
+        read_only_fields = ['email', 'role', 'created_at']
 
+# ----------------------
+# ✅ Password Change
+# ----------------------
 class PasswordChangeSerializer(serializers.Serializer):
     current_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)
@@ -41,18 +42,11 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = self.context['request'].user
-
-        # Check current password is correct
         if not user.check_password(data['current_password']):
             raise serializers.ValidationError({"current_password": "Incorrect current password."})
-
-        # Check new and confirm match
         if data['new_password'] != data['confirm_password']:
             raise serializers.ValidationError({"confirm_password": "New passwords do not match."})
-
-        # Optional: enforce strong password policy
         validate_password(data['new_password'], user)
-
         return data
 
     def save(self, **kwargs):
@@ -61,6 +55,9 @@ class PasswordChangeSerializer(serializers.Serializer):
         user.save()
         return user
 
+# ----------------------
+# ✅ Role + Country Assignment (Manager & Tech Admin)
+# ----------------------
 class AssignRoleSerializer(serializers.ModelSerializer):
     assigned_country = serializers.CharField(required=False, allow_blank=True)
 
@@ -78,17 +75,22 @@ class AssignRoleSerializer(serializers.ModelSerializer):
             data['assigned_country'] = None
         return data
 
+# ----------------------
+# ✅ User List View (excluding tech-admins)
+# ----------------------
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password', 'user_permissions', 'groups']
 
     def to_representation(self, instance):
-        rep = super().to_representation(instance)
         if instance.role == 'tech-admin':
-            return None  # Skip tech-admins entirely
-        return rep
+            return None
+        return super().to_representation(instance)
 
+# ----------------------
+# ✅ Reset Email or Password (Tech Admin)
+# ----------------------
 class ResetUserCredentialsSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     email = serializers.EmailField(required=False)
@@ -110,7 +112,9 @@ class ResetUserCredentialsSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-# User timezone preference
+# ----------------------
+# ✅ User Preference (timezone, country, dark mode)
+# ----------------------
 class UserPreferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
