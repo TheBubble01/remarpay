@@ -1,12 +1,9 @@
-import React from 'react';
-import AppRoutes from './routes/AppRoutes';
-
-function App() {
+export default function App() {
   return (
-    <div className="text-center text-xl text-blue-600 p-4">
-      Hello from RemarPay Frontend!
+    <div className="min-h-screen flex items-center justify-center bg-gray-200">
+      <div className="bg-red-500 text-white p-4 rounded-lg">
+        If this is red, Tailwind is finally working!
+      </div>
     </div>
-  );
+  )
 }
-
-export default App;
