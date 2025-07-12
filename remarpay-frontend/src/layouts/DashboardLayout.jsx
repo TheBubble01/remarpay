@@ -4,7 +4,7 @@ import { Link, Outlet } from "react-router-dom";
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const username = localStorage.getItem("userName") || "User";
-  // const role = localStorage.getItem("userRole") || "guest";
+  const role = localStorage.getItem("userRole") || "guest";
 
   const handleLogout = () => {
     localStorage.removeItem("access");
@@ -12,11 +12,40 @@ export default function DashboardLayout() {
     window.location.href = "/login";
   };
 
-  const navItems = [
+  /* const navItems = [
     { name: "Home", to: "/dashboard" },
     // { name: "New Request", to: "/dashboard/cashier/new-request" },
     // ... add based on role
-  ];
+  ]; */
+
+  // Nav items based on role
+  const roleNavs = {
+    cashier: [
+      { name: "Home", to: "/dashboard" },
+      { name: "New Request", to: "/dashboard/cashier/new-request" },
+      { name: "Client History", to: "/dashboard/cashier/clients" }
+    ],
+    agent: [
+      { name: "Home", to: "/dashboard" },
+      { name: "Pending Payments", to: "/dashboard/agent/pending" },
+      { name: "Payment History", to: "/dashboard/agent/history" }
+    ],
+    manager: [
+      { name: "Home", to: "/dashboard" },
+      { name: "All Transactions", to: "/dashboard/manager/transactions" },
+      { name: "Manage Users", to: "/dashboard/manager/users" }
+    ],
+    "tech-admin": [
+      { name: "Home", to: "/dashboard" },
+      { name: "System Settings", to: "/dashboard/admin/settings" },
+      { name: "User Control", to: "/dashboard/admin/users" }
+    ]
+  };
+
+const navItems = roleNavs[role] || [];
+
+
+  
 
   return (
     <div className="flex h-screen overflow-hidden">
