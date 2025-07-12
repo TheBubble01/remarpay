@@ -24,8 +24,11 @@ export default function LoginForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Invalid credentials");
 
+      const tokenPayload = JSON.parse(atob(data.access.split('.')[1]));
       localStorage.setItem("access", data.access);
       localStorage.setItem("refresh", data.refresh);
+      localStorage.setItem("userName", tokenPayload.name);
+      localStorage.setItem("userRole", tokenPayload.role);
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
