@@ -17,6 +17,12 @@ from .serializers import (
     UserPreferenceSerializer
 )
 
+# Force JWT for login to accept email for login instead of username
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import MyTokenObtainPairSerializer
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
 # --------------------------------------------
 # ✅ Tech Admin Dashboard
 # --------------------------------------------

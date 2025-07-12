@@ -2,6 +2,29 @@ from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from .models import User
 
+# Force the JWT to acceept email for login instead of username
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add extra info
+        token['name'] = user.name
+        token['role'] = user.role
+        return token
+
+    def validate(self, attrs):
+        print("Login payload received:", attrs) # Debug login credentials
+        data = super().validate(attrs)
+        # Add user info in response
+        data['user'] = {
+            "id": self.user.id,
+            "name": self.user.name,
+            "role": self.user.role,
+            "email": self.user.email
+        }
+        return data
+
 # ----------------------
 # ✅ User Creation
 # ----------------------

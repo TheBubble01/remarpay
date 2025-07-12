@@ -10,11 +10,14 @@ from .views import (
     UserListView,
     ResetUserCredentialsView,
     UserPreferenceView,
+    MyTokenObtainPairView,
 )
 
 urlpatterns = [
     # 🔐 Auth
-    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    #path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', MyTokenObtainPairView.as_view(), name='login'),
+
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # 👤 User Management
