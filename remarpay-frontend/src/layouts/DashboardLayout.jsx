@@ -3,7 +3,8 @@ import { Link, Outlet } from "react-router-dom";
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const username = localStorage.getItem("userName") || "User"; // you can store name on login
+  const username = localStorage.getItem("userName") || "User";
+  // const role = localStorage.getItem("userRole") || "guest";
 
   const handleLogout = () => {
     localStorage.removeItem("access");
