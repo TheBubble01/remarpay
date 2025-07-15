@@ -9,6 +9,9 @@ import ProtectedRoute from "../components/common/ProtectedRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Dashboard from "../pages/dashboard/Dashboard";
 
+// Cashier pages
+import NewRequest from "../pages/cashier/NewRequest";
+
 // Fallback
 import NotFound from "../pages/shared/NotFound";
 
@@ -22,13 +25,14 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="cashier/new-request" element={<NewRequest />} />
         </Route>
       </Route>
 
       {/* Redirect root to login */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Catch-all route */}
+      {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
