@@ -42,7 +42,7 @@ export default function DashboardLayout() {
     ]
   };
 
-const navItems = roleNavs[role] || [];
+  const navItems = roleNavs[role] || [];
 
 
   
@@ -55,16 +55,26 @@ const navItems = roleNavs[role] || [];
           fixed inset-y-0 left-0 transform bg-white shadow-lg 
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
           md:relative md:translate-x-0 transition-transform duration-300
-          w-64
+          w-64 z-40
         `}
       >
-        <div className="p-4 font-bold text-xl text-indigo-600">RemarPay</div>
+        <div className="p-4 font-bold text-xl text-indigo-600 flex justify-between items-center">
+          RemarPay
+          <button
+            className="md:hidden text-gray-600"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar"
+          >
+            ✖
+          </button>
+        </div>
         <nav className="mt-6">
           {navItems.map((item) => (
             <Link
               key={item.to}
               to={item.to}
               className="block px-4 py-2 text-gray-700 hover:bg-indigo-100"
+              onClick={() => setSidebarOpen(false)}
             >
               {item.name}
             </Link>
@@ -79,6 +89,7 @@ const navItems = roleNavs[role] || [];
           <button
             className="md:hidden"
             onClick={() => setSidebarOpen((o) => !o)}
+            aria-label="Toggle sidebar"
           >
             {sidebarOpen ? "✖" : "☰"}
           </button>
@@ -94,7 +105,7 @@ const navItems = roleNavs[role] || [];
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white p-6">
           <Outlet />
         </main>
       </div>
