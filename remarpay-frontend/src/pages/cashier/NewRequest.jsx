@@ -43,11 +43,55 @@ export default function NewRequest() {
     }
   };
 
-  const handleSubmit = (e) => {
+  /* const handleSubmit = (e) => {
     e.preventDefault();
     alert("Request submitted (simulation). Check console for payload.");
     console.log(form);
+  }; */
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const access = localStorage.getItem("access");
+    if (!access) return alert("You are not authenticated");
+
+    try {
+      const payload = {
+        country: form.country,
+        deposit_amount_dinar: parseFloat(form.amount),
+        fee_applied: parseFloat(form.amount) < 500,
+        net_amount_dinar: parseFloat(form.amount) < 500 ? parseFloat(form.amount) - 5 : parseFloat(form.amount),
+        depositor_name: form.depositorName,
+        depositor_phone: form.depositorPhone,
+        receiver_name: form.country === "nigeria" ? form.accountName : form.receiverName,
+        receiver_phone: form.country === "nigeria" ? form.depositorPhone : form.receiverPhone,
+        receiver_account_number: form.country === "nigeria" ? form.accountNumber : "",
+        receiver_bank_name: form.country === "nigeria" ? form.bankName : "",
+        receiver_account_name: form.country === "nigeria" ? form.accountName : "",
+        nita_office: form.country === "nigeria" ? "" : form.nitaOffice,
+        note: form.note || ""
+      };
+
+      const res = await fetch("http://127.0.0.1:8000/api/payments/cashier/create-request/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.detail || "Something went wrong");
+      alert("Payment request submitted successfully!");
+      console.log("✅ Response:", data);
+    } catch (err) {
+      console.error("❌ Submission error:", err);
+      alert(err.message);
+    }
   };
+
 
   const transferFee = form.amount && Number(form.amount) < 500 ? 5 : 0;
 
