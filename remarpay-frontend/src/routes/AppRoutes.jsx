@@ -11,6 +11,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 
 // Cashier pages
 import NewRequest from "../pages/cashier/NewRequest";
+import Receipt from "../pages/dashboard/Receipt";
 
 // Fallback
 import NotFound from "../pages/shared/NotFound";
@@ -26,6 +27,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="cashier/new-request" element={<NewRequest />} />
+          <Route path="/dashboard/receipt/:id" element={<Receipt />} />
         </Route>
       </Route>
 

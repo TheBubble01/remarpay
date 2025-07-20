@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const COUNTRIES = ["nigeria", "niger", "cameroon"];
 
@@ -49,6 +50,7 @@ export default function NewRequest() {
     console.log(form);
   }; */
 
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -84,8 +86,11 @@ export default function NewRequest() {
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.detail || "Something went wrong");
-      alert("Payment request submitted successfully!");
+      alert("✅ Payment request submitted successfully!");
       console.log("✅ Response:", data);
+
+      // Redirect to receipt page using returned payment ID
+      navigate(`/dashboard/receipt/${data.id}`);
     } catch (err) {
       console.error("❌ Submission error:", err);
       alert(err.message);
