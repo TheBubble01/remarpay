@@ -6,7 +6,13 @@ export default {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        forest: "#014421",
+        gold: "#D4AF37",
+      },
+    },
   },
+  darkMode: "class", // Keep dark mode support
   plugins: [],
-}
+};
