@@ -82,6 +82,13 @@ export default function Receipt() {
         >
           Share via WhatsApp
         </button>
+        {/* <a
+          href="/dashboard/new-request"
+          className="bg-white hover:bg-gray-100 text-[#014421] border border-[#014421] px-4 py-2 rounded text-sm text-center"
+          style={{ textDecoration: "none" }}
+        >
+          + New Payment
+        </a> */}
       </div>
 
       {/* Receipt Card */}
@@ -141,7 +148,7 @@ export default function Receipt() {
         </div>
 
         {/* Footer Info */}
-        <div className="text-right text-xs opacity-90 pt-6">
+        <div className="text-right text-xs opacity-90 pt-6" style={{ color: "#ffffff" }}>
           <p><span className="font-medium">Cashier:</span> {cashier_name}</p>
           <p><span className="font-medium">Ref ID:</span> #{id}</p>
         </div>
