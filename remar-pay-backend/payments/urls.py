@@ -14,7 +14,7 @@ urlpatterns = [
     path('cashier/create-request/', CreatePaymentRequestView.as_view(), name='create-payment-request'),
     path('cashier/receipt/<int:pk>/', GenerateReceiptView.as_view(), name='generate-receipt'),
     path('cashier/cancel/<int:pk>/', CancelPaymentRequestView.as_view(), name='cancel-payment'),
-    path('cashier/history/', CashierTransactionHistoryView.as_view(), name='cashier-transaction-history'), # name='cashier-history'
+    path('cashier/history/', CashierTransactionHistoryView.as_view(), name='cashier-history'), # name='cashier-transaction-history'
     
     # Agent endpoints
     path('agent/requests/', AssignedRequestsListView.as_view(), name='agent-requests'),
