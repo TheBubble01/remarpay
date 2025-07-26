@@ -159,3 +159,47 @@ class PaymentRequestSearchView(generics.ListAPIView):
                 pass  # Invalid date format
 
         return qs.order_by('-created_at')
+
+# Cashier: View own transaction history
+class CashierTransactionHistoryView(generics.ListAPIView):
+    serializer_class = PaymentRequestSerializer
+    permission_classes = [IsAuthenticated, IsCashier]
+
+    def get_queryset(self):
+        user = self.request.user
+        params = self.request.GET
+        qs = PaymentRequest.objects.filter(cashier=user)
+
+        # Optional filters
+        if params.get('is_paid') in ['true', 'false']:
+            qs = qs.filter(is_paid=params['is_paid'] == 'true')
+        if params.get('is_cancelled') in ['true', 'false']:
+            qs = qs.filter(is_cancelled=params['is_cancelled'] == 'true')
+        if params.get('country'):
+            qs = qs.filter(country__iexact=params['country'])
+        if params.get('depositor_phone'):
+            qs = qs.filter(depositor_phone__icontains=params['depositor_phone'])
+        if params.get('receiver'):
+            qs = qs.filter(
+                Q(receiver_name__icontains=params['receiver']) |
+                Q(receiver_phone__icontains=params['receiver'])
+            )
+        if params.get('min_amount'):
+            try:
+                qs = qs.filter(deposit_amount_dinar__gte=float(params['min_amount']))
+            except ValueError:
+                pass
+        if params.get('max_amount'):
+            try:
+                qs = qs.filter(deposit_amount_dinar__lte=float(params['max_amount']))
+            except ValueError:
+                pass
+        if params.get('start_date') and params.get('end_date'):
+            try:
+                start = datetime.strptime(params['start_date'], '%Y-%m-%d')
+                end = datetime.strptime(params['end_date'], '%Y-%m-%d')
+                qs = qs.filter(created_at__range=(start, end))
+            except ValueError:
+                pass
+
+        return qs.order_by('-created_at')
