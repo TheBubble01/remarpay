@@ -8,8 +8,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        forest: "#014421",
-        gold: "#D4AF37",
+        forest: "#041c05ff",
+        gold: "#e6be8a",
       },
     },
   },

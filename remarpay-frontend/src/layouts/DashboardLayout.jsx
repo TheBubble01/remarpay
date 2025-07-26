@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import remarLogo from "/logo.jpg"; // Ensure this logo file is in public/
+import remarLogo from "/logo.jpg";
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -11,7 +11,7 @@ export default function DashboardLayout() {
     cashier: [
       { name: "Home", to: "/dashboard" },
       { name: "New Request", to: "/dashboard/cashier/new-request" },
-      { name: "Client History", to: "/dashboard/cashier/clients" },
+      { name: "Order History", to: "/dashboard/cashier/history" },
     ],
     agent: [
       { name: "Home", to: "/dashboard" },
@@ -42,7 +42,7 @@ export default function DashboardLayout() {
     <div className="relative min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-[#014421] shadow-lg transition-transform duration-300 ease-in-out
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-[#041c05ff] shadow-lg transition-transform duration-300 ease-in-out
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="p-4 border-b border-white/20 flex justify-between items-center">
@@ -81,7 +81,7 @@ export default function DashboardLayout() {
       {/* Main layout */}
       <div className="flex flex-col min-h-screen">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-4 bg-[#014421] text-white shadow z-30">
+        <header className="flex items-center justify-between px-6 py-4 bg-[#041c05ff] text-white shadow z-30">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen((prev) => !prev)}
