@@ -114,64 +114,77 @@ export default function CashierHistory() {
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg shadow-lg bg-white dark:bg-[#041c05ff]">
-        <table className="min-w-full text-sm text-gray-900 dark:text-white">
-            <thead className="bg-[#041c05ff] text-white uppercase text-xs tracking-wider">
-            <tr>
-                <th className="px-4 py-3 text-left">#</th>
-                <th className="px-4 py-3 text-left">Receiver</th>
-                <th className="px-4 py-3 text-left">Amount (Dinar)</th>
-                <th className="px-4 py-3 text-left">Date</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {payments.map((p, i) => (
-                <tr
-                key={p.id}
-                className={`border-b dark:border-[#1a5233] ${
-                    i % 2 === 0 ? "bg-gray-50 dark:bg-[#014421]" : "bg-white dark:bg-[#025932]"
-                } hover:bg-gray-100 dark:hover:bg-[#027d4f] transition`}
-                >
-                <td className="px-4 py-3">{(page - 1) * 10 + i + 1}</td>
-                <td className="px-4 py-3">{p.receiver_name}</td>
-                <td className="px-4 py-3">{p.deposit_amount_dinar}</td>
-                <td className="px-4 py-3">{p.created_at.toLocaleDateString()}</td>
-                <td className="px-4 py-3">
-                    {p.is_cancelled ? (
-                    <span className="inline-block bg-red-600 text-white text-xs px-3 py-1 rounded-full font-medium">
-                        Cancelled
-                    </span>
-                    ) : p.is_paid ? (
-                    <span className="inline-block bg-green-700 text-white text-xs px-3 py-1 rounded-full font-medium">
-                        Paid
-                    </span>
-                    ) : (
-                    <span className="inline-block bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-medium">
-                        Unpaid
-                    </span>
-                    )}
-                </td>
-                <td className="px-4 py-3 space-x-2 flex items-center">
-                    <Link
-                    to={`/dashboard/receipt/${p.id}`}
-                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs font-medium transition"
-                    >
-                    View
-                    </Link>
-                    {!p.is_paid && !p.is_cancelled && (
-                    <button
-                        onClick={() => handleCancel(p.id)}
-                        className="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-medium transition"
-                    >
-                        Cancel
-                    </button>
-                    )}
-                </td>
+        {payments.length > 0 ? (
+            <table className="min-w-full text-sm text-gray-900 dark:text-white">
+                <thead className="bg-[#041c05ff] text-white uppercase text-xs tracking-wider">
+                <tr>
+                    <th className="px-4 py-3 text-left">#</th>
+                    <th className="px-4 py-3 text-left">Receiver</th>
+                    <th className="px-4 py-3 text-left">Amount (Dinar)</th>
+                    <th className="px-4 py-3 text-left">Date</th>
+                    <th className="px-4 py-3 text-left">Status</th>
+                    <th className="px-4 py-3 text-left">Actions</th>
                 </tr>
-            ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {payments.map((p, i) => (
+                    <tr
+                    key={p.id}
+                    className={`border-b dark:border-[#1a5233] ${
+                        i % 2 === 0 ? "bg-gray-50 dark:bg-[#014421]" : "bg-white dark:bg-[#025932]"
+                    } hover:bg-gray-100 dark:hover:bg-[#027d4f] transition`}
+                    >
+                    <td className="px-4 py-3">{(page - 1) * 10 + i + 1}</td>
+                    <td className="px-4 py-3">{p.receiver_name}</td>
+                    <td className="px-4 py-3">{p.deposit_amount_dinar}</td>
+                    <td className="px-4 py-3">
+                        {new Date(p.created_at).toLocaleString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: true,
+                        })}
+                    </td>
+                    <td className="px-4 py-3">
+                        {p.is_cancelled ? (
+                        <span className="inline-block bg-red-600 text-white text-xs px-3 py-1 rounded-full font-medium">
+                            Cancelled
+                        </span>
+                        ) : p.is_paid ? (
+                        <span className="inline-block bg-green-700 text-white text-xs px-3 py-1 rounded-full font-medium">
+                            Paid
+                        </span>
+                        ) : (
+                        <span className="inline-block bg-yellow-400 text-black text-xs px-3 py-1 rounded-full font-medium">
+                            Unpaid
+                        </span>
+                        )}
+                    </td>
+                    <td className="px-4 py-3 space-x-2 flex items-center">
+                        <Link
+                        to={`/dashboard/receipt/${p.id}`}
+                        className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs font-medium transition"
+                        >
+                        View
+                        </Link>
+                        {!p.is_paid && !p.is_cancelled && (
+                        <button
+                            onClick={() => handleCancel(p.id)}
+                            className="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-medium transition"
+                        >
+                            Cancel
+                        </button>
+                        )}
+                    </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        ) : (
+            <p className="text-center py-4 text-gray-500 dark:text-gray-300">No records found.</p>
+        )}
       </div>
         
       {/* Pagination */}

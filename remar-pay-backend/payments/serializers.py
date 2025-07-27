@@ -7,8 +7,8 @@ from rates.models import ExchangeRate  # Holds remar_rate for each country
 class PaymentRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentRequest
-        exclude = ['status', 'cashier', 'created_at']  # System-managed fields
-        read_only_fields = ['net_amount_dinar', 'converted_amount', 'conversion_rate', 'fee_applied']
+        exclude = ['status', 'cashier']  # System-managed fields
+        read_only_fields = ['net_amount_dinar', 'converted_amount', 'conversion_rate', 'fee_applied', 'created_at']
 
     def validate(self, data):
         country = data.get('country')
