@@ -14,6 +14,9 @@ import NewRequest from "../pages/cashier/NewRequest";
 import Receipt from "../pages/dashboard/Receipt";
 import CashierHistory from "../pages/cashier/CashierHistory";
 
+// Agent pages
+import AssignedRequests from "../pages/agent/AssignedRequests";
+
 // Fallback
 import NotFound from "../pages/shared/NotFound";
 
@@ -27,9 +30,13 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
+
           <Route path="cashier/new-request" element={<NewRequest />} />
           <Route path="/dashboard/receipt/:id" element={<Receipt />} />
           <Route path="cashier/history" element={<CashierHistory />} />
+
+          <Route path="/dashboard/agent/pending" element={<AssignedRequests />} />
+
         </Route>
       </Route>
 

@@ -1,21 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
-from .forms import UserCreationForm, UserChangeForm
 
 User = get_user_model()
 
 @admin.register(User)
 class CustomUserAdmin(BaseUserAdmin):
-    add_form = UserCreationForm
-    form = UserChangeForm
     model = User
-
     list_display = ('email', 'name', 'role', 'is_staff', 'is_active', 'created_at')
     list_filter = ('role', 'is_staff', 'is_active')
     search_fields = ('email', 'name', 'phone')
     ordering = ('-created_at',)
-    readonly_fields = ('last_login', 'created_at')
 
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
